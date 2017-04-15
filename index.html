@@ -17,7 +17,7 @@ E = 1.4e11;
 slen = 0.1;
 Kbond = 8;
 Sbond = 2.8e5;
-n = 10;
+n = 5;
 Yield = 180e3;
 Rupture = 0.2;
 ds = 1e7;
@@ -26,13 +26,17 @@ dr = 0.41;
 theta = 40.0;
 disp = 4e-3;
 
-c1 = E*A/slen
-c2 = Kbond*slen
-c3 = Sbond*slen
+n = 2*n;
+Kbond = 10**Kbond;
+
+
+c1 = E*A/slen;
+c2 = Kbond*slen;
+c3 = Sbond*slen;
 c2i = math.multiply(math.ones(n), c2); console.log(c2i);
-ab = math.matrix();
-ab.resize([n,n]);
-//ab = math.sparsematrix();
+//ab = math.matrix();
+//ab.resize([n,n]);
+ab = math.sparse();
 console.log(ab);
 b = math.matrix();
 b.resize([n]);
@@ -45,16 +49,18 @@ for(i = 0; i < n; i++) {
     if (i > Math.floor(n/2-1)) {
         b.set([i], -db1*c2i.get([i]));
     } else {
-        b.set([i], 0.0);
+        b.set([i], -db0*c2i.get([i]));
     }
-    ab.set([i, i], -c1-c2i.get([i]));
     if (i==0) {
         ab.set([i,i+1], c1);
+        ab.set([i, i], -c1-c2i.get([i]));
     } else if (i==n-1) {
         ab.set([i,i-1], c1);
+        ab.set([i, i], -c1-c2i.get([i]));
     } else {
         ab.set([i, i-1], c1);
         ab.set([i, i+1], c1);
+        ab.set([i, i], -2*c1-c2i.get([i]));
     }
 }
 
