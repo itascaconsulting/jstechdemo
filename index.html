@@ -32,19 +32,15 @@ body {
 </style>
 
 <p id="paragraph"></p>
+    <p id="show_data"></p>
+
 
 <script src="./d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="./math.js"></script>
+<script src="./d3.slider.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="d3.slider.css" media="screen" />
 
 <script>
-
-
-function write_line(data) {
-    var h1 = document.createElement("div");
-    h1.setAttribute('style', 'white-space: pre;');
-    h1.textContent += data + "\r\n";
-    document.body.appendChild(h1);
-}
 
 // inputs
 A = 201e-6;
@@ -61,19 +57,70 @@ dr = 0.41;
 theta = 40.0;
 disp = 4e-3;
 
+
+var controls = [["Cable area [m^2]",           100e-6,  A,       100e-5],
+                ["Cable Young's modulus [Pa]",   1e10, E,       1e12],
+                ["Node spacing [m]",           0.05,    slen,    0.4],
+                ["Grout stiffness [N/m/m]",          7,     Kbond,   11],
+                ["Grout strength [N/m]",          1e4,     Sbond,   1e6],
+                ["Number of nodes [half]",              5,       n,       25],
+                ["Cable yield strength [N]",          50e3,    Yield,   250e3],
+                ["Cable rupture strain []",        0.05,    Rupture, 0.8],
+                ["Cable shear stiffness [N/m]",    1e6,     ds,      4e7],
+                ["Cable shear strength [N]",    1e4,     dy,      2e5],
+                ["Shear rupture strain []",  1e-1,    dr,      6e-1],
+                ["Joint friction angle [deg]", 0.0, theta, 50.0],
+                ["Displacement [m]",           1e-5,    disp,    5e-2]];
+
+sliders = [];
+
+for (i=0; i<controls.length; i++) {
+    name = controls[i][0];
+    min_val = controls[i][1];
+    start_val = controls[i][2];
+    max_val = controls[i][3];
+    write_line(name);
+    var temp_slider = document.createElement("div");
+    temp_slider.setAttribute("id", "slider"+i);
+    document.body.appendChild(temp_slider);
+    var tmp_d3slider = d3.slider().min(min_val).max(max_val).ticks(10).showRange(true).value(start_val).callback(scb);
+
+    d3.select('#slider'+i).call(tmp_d3slider);
+
+    sliders.push(tmp_d3slider)
+}
+
+function write_line2(data) {
+
+    var show_data = document.getElementById("show_data");
+    show_data.setAttribute('style', 'white-space: pre;');
+    show_data.textContent = data + "\r\n";
+
+}
+
+
+
+
+
+function write_line(data) {
+    var h1 = document.createElement("div");
+    h1.setAttribute('style', 'white-space: pre;');
+    h1.textContent += data + "\r\n";
+    document.body.appendChild(h1);
+}
+
+
 function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp) {
     //derived properties
-    n = 2*n;
+    n = 2*parseInt(n);
     Kbond = 10**Kbond;
     c1 = E*A/slen;
     c2 = Kbond*slen;
     c3 = Sbond*slen;
-    c2i = math.multiply(math.ones(n), c2); console.log(c2i);
+    c2i = math.multiply(math.ones(n), c2);
     ab = math.sparse();
-    console.log(ab);
     b = math.matrix();
     b.resize([n]);
-    console.log(b);
     db0 = 0.0;
     db1 = disp;
 
@@ -98,8 +145,8 @@ function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp)
     }
     ndis = math.lusolve(ab,b);
     x = math.multiply(math.range(0, n), slen).toArray();
-    data = math.flatten(ndis).toArray();
-    return {x:x, data:data};
+    ddata = math.flatten(ndis).toArray();
+    return {x:x, ddata:ddata};
 }
 
 solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp)
@@ -110,7 +157,7 @@ solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,dis
 
 var data = [ { label: "Displacement",
                x: x,
-               y: data },] ;
+               y: ddata },] ;
 
 var xy_chart = d3_xy_chart()
     .width(960)
@@ -258,5 +305,20 @@ function d3_xy_chart() {
 
     return chart;
 }
+
+function scb() {
+    local_values = [];
+    data = "";
+    for (i=0; i<sliders.length; i++) {
+        data += sliders[i].value() + ", ";
+        local_values.push(sliders[i].value());
+    }
+    write_line2(data);
+    displacements.apply(null, local_values);
+}
+
+
+scb()
+
 
 </script>
