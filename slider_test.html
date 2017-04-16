@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<script src="./d3.v3.min.js" charset="utf-8"></script>
+<script src="./d3.slider.js" charset="utf-8"></script>
+<link rel="stylesheet" type="text/css" href="d3.slider.css" media="screen" />
+
+    <div id="slider"></div>
+
+<script>
+
+A = 201e-6
+E = 1.4e11
+slen = 0.1
+Kbond = 8
+Sbond = 2.8e5
+n = 10
+Yield = 180e3
+Rupture = 0.2
+ds = 1e7
+dy = 62.8e3
+dr = 0.41
+theta = 40.0
+disp = 4e-3
+
+var controls = [["Cable area [m^2]",           100e-6,  A,       100e-5],
+                ["Cable Young's modulus [Pa]",   1e10, E,       1e12],
+                ["Node spacing [m]",           0.05,    slen,    0.4],
+                ["Grout stiffness [N/m/m]",          7,     Kbond,   11],
+                ["Grout strength [N/m]",          1e4,     Sbond,   1e6],
+                ["Number of nodes [half]",              5,       n,       25],
+                ["Cable yield strength [N]",          50e3,    Yield,   250e3],
+                ["Cable rupture strain []",        0.05,    Rupture, 0.8],
+                ["Cable shear stiffness [N/m]",    1e6,     ds,      4e7],
+                ["Cable shear strength [N]",    1e4,     dy,      2e5],
+                ["Shear rupture strain []",  1e-1,    dr,      6e-1],
+                ["Joint friction angle [deg]", 0.0, theta, 50.0],
+                ["Displacement [m]",           1e-5,    disp,    5e-2]];
+
+
+function write_line(data) {
+    var h1 = document.createElement("div");
+    h1.setAttribute('style', 'white-space: pre;');
+    h1.textContent += data + "\r\n";
+    document.body.appendChild(h1);
+}
+
+function scb() {
+    write_line(slider.value());
+}
+
+var slider = d3.slider().min(0).max(10).ticks(10).showRange(true).value(6).callback(scb);
+// Render the slider in the div
+d3.select('#slider').call(slider);
+
+
+
+
+
+</script>

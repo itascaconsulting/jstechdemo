@@ -61,49 +61,48 @@ dr = 0.41;
 theta = 40.0;
 disp = 4e-3;
 
-//derived properties
-n = 2*n;
-Kbond = 10**Kbond;
+function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp) {
+    //derived properties
+    n = 2*n;
+    Kbond = 10**Kbond;
+    c1 = E*A/slen;
+    c2 = Kbond*slen;
+    c3 = Sbond*slen;
+    c2i = math.multiply(math.ones(n), c2); console.log(c2i);
+    ab = math.sparse();
+    console.log(ab);
+    b = math.matrix();
+    b.resize([n]);
+    console.log(b);
+    db0 = 0.0;
+    db1 = disp;
 
-c1 = E*A/slen;
-c2 = Kbond*slen;
-c3 = Sbond*slen;
-c2i = math.multiply(math.ones(n), c2); console.log(c2i);
-//ab = math.matrix();
-//ab.resize([n,n]);
-ab = math.sparse();
-console.log(ab);
-b = math.matrix();
-b.resize([n]);
-console.log(b);
-
-db0 = 0.0;
-db1 = disp;
-
-// calculation
-for(i = 0; i < n; i++) {
-    if (i > Math.floor(n/2-1)) {
-        b.set([i], -db1*c2i.get([i]));
-    } else {
-        b.set([i], -db0*c2i.get([i]));
+    // construct matrix
+    for(i = 0; i < n; i++) {
+        if (i > Math.floor(n/2-1)) {
+            b.set([i], -db1*c2i.get([i]));
+        } else {
+            b.set([i], -db0*c2i.get([i]));
+        }
+        if (i==0) {
+            ab.set([i,i+1], c1);
+            ab.set([i, i], -c1-c2i.get([i]));
+        } else if (i==n-1) {
+            ab.set([i,i-1], c1);
+            ab.set([i, i], -c1-c2i.get([i]));
+        } else {
+            ab.set([i, i-1], c1);
+            ab.set([i, i+1], c1);
+            ab.set([i, i], -2*c1-c2i.get([i]));
+        }
     }
-    if (i==0) {
-        ab.set([i,i+1], c1);
-        ab.set([i, i], -c1-c2i.get([i]));
-    } else if (i==n-1) {
-        ab.set([i,i-1], c1);
-        ab.set([i, i], -c1-c2i.get([i]));
-    } else {
-        ab.set([i, i-1], c1);
-        ab.set([i, i+1], c1);
-        ab.set([i, i], -2*c1-c2i.get([i]));
-    }
+    ndis = math.lusolve(ab,b);
+    x = math.multiply(math.range(0, n), slen).toArray();
+    data = math.flatten(ndis).toArray();
+    return {x:x, data:data};
 }
 
-ndis = math.lusolve(ab,b);
-
-x = math.multiply(math.range(0, n), slen).toArray();
-data = math.flatten(ndis).toArray();
+solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp)
 
 //write_line(data);
 
