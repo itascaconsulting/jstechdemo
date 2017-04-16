@@ -1,7 +1,11 @@
 <p id="paragraph"></p>
 
-<script type="text/javascript"
-src="./math.js"></script>
+<svg class="chart"></svg>
+<script src="./d3.v3.min.js" charset="utf-8"></script>
+
+
+<script type="text/javascript" src="./math.js"></script>
+
 <script>
 
 
@@ -64,10 +68,82 @@ for(i = 0; i < n; i++) {
     }
 }
 
-x = math.lusolve(ab,b);
-console.log(x);
-write_line(x);
+ndis = math.lusolve(ab,b);
+
+x = math.multiply(math.range(0, n), slen).toArray();
+data = math.flatten(ndis).toArray();
+
+write_line(data);
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 
+// start new
+var xy = [];
+for(var i=0;i<x.length;i++){
+   xy.push({x:x[i],y:data[i]});
+}
+
+var xscl = d3.scale.linear()
+    .domain(d3.extent(xy,function(d) {return d.x;}))
+    .range([0 + margin.left, width])
+
+var yscl = d3.scale.linear()
+    .domain(d3.extent(xy,function(d) {return d.y;}))
+    .range([height, margin.top])
+
+var slice = d3.svg.line()
+  .x(function(d,i) { return xscl(d.x);})
+  .y(function(d,i) { return yscl(d.y);})
+
+//end new
+
+
+var svg = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// // setup x
+// var xScale = d3.scale.linear().range([0, width]),
+     xAxis = d3.svg.axis().scale(xscl).orient("bottom");
+
+// // setup y
+// var yScale = d3.scale.linear().range([height, 0]),
+     yAxis = d3.svg.axis().scale(yscl).orient("left");
+
+// x-axis
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
+  .append("text")
+    .attr("class", "label")
+    .attr("x", width)
+    .attr("y", -6)
+    .style("text-anchor", "end")
+    .text("Length along cable [m]");
+
+// y-axis
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis)
+  .append("text")
+    .attr("class", "label")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Displacement [m]");
+
+svg.append("path")
+    .attr("class", "line")
+    .attr("d", slice(xy))
+    .style("fill", "none")
+    .style("stroke", "red")
+    .style("stroke-width", 2);
 
 </script>
