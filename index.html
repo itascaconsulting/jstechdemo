@@ -31,9 +31,13 @@ body {
 
 </style>
 
-<p id="paragraph"></p>
-    <p id="show_data"></p>
 
+
+<h1>Parameters</h1>
+    <p id="params"></p>
+<h1>Node displacements</h1>
+    <p id="disp"></p>
+<h1>Input sliders</h1>
 
 <script src="./d3.v3.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="./math.js"></script>
@@ -42,7 +46,7 @@ body {
 
 <script>
 
-// inputs
+// default inputs
 A = 201e-6;
 E = 1.4e11;
 slen = 0.1;
@@ -91,15 +95,13 @@ for (i=0; i<controls.length; i++) {
 }
 
 function write_line2(data) {
-
-    var show_data = document.getElementById("show_data");
+    var show_data = document.getElementById("params");
     show_data.setAttribute('style', 'white-space: pre;');
     show_data.textContent = data + "\r\n";
-
+    var show_data = document.getElementById("disp");
+    show_data.setAttribute('style', 'white-space: pre;');
+    show_data.textContent = ddata + "\r\n";
 }
-
-
-
 
 
 function write_line(data) {
