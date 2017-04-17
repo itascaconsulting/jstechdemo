@@ -324,7 +324,7 @@ xy_chart = d3_xy_chart()
     .xlabel("Length along cable [m]")
     .ylabel("Displacement [m]") ;
 
-d3.select("#section__graph").children("svg").remove();
+// d3.select("#section__graph").children("svg").remove();
 
 
 d3.select("#section__graph").append("svg")
