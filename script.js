@@ -66,6 +66,7 @@ function write_line2(data) {
     show_data.textContent = data + "\r\n";
     var show_data = document.getElementById("disp");
     show_data.setAttribute('style', 'white-space: pre;');
+    console.log("ddata", ddata);
     show_data.textContent = ddata + "\r\n";
 }
 
@@ -131,19 +132,24 @@ solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,dis
 // plotting
 
 var data = [ { label: "Displacement",
-               x: x,
-               y: ddata },] ;
+               x: x.map(function(i){return i*2}),
+               y: ddata },
+             { label: "displacement x2",
+                x: x,
+              y: ddata}] ;
 
 var xy_chart = d3_xy_chart()
-    .width(960)
-    .height(500)
+    // .width(960)
+    // .height(500)
     .xlabel("Length along cable [m]")
     .ylabel("Displacement [m]") ;
+
 var svg = d3.select("#section__graph").append("svg")
     .datum(data)
     .call(xy_chart) ;
 
 function d3_xy_chart() {
+  console.log("here");
     var width = 640,
         height = 480,
         xlabel = "X Axis Label",
@@ -290,10 +296,48 @@ function scb() {
     }
     write_line2(data);
     displacements.apply(null, local_values);
+
+
+
+    // console.log(document.getElementById("section__graph").replace());
+
+
+        // .datum(data)
+        // .call(xy_chart) ;
+
+
 }
 
-
 scb()
+
+d3.select("#div__sliders").on("click", function() {
+console.log("wow");
+// ok, this happens every time the slider is clicked or clicked and dragged.
+
+data = [ { label: "Displacement",
+               x: x,
+               y: ddata },] ;
+
+xy_chart = d3_xy_chart()
+    // .width(960)
+    // .height(500)
+    .xlabel("Length along cable [m]")
+    .ylabel("Displacement [m]") ;
+
+d3.select("#section__graph").children("svg").remove();
+
+
+d3.select("#section__graph").append("svg")
+    .datum(data)
+    .call(xy_chart) ;
+
+
+
+
+
+});
+
+
 
 
 };
