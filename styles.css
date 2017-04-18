@@ -28,8 +28,9 @@ body {
 #section__slider {
   width: 50%;
   float:left;
-  height: 82vh;
+  height: 95vh;
   overflow:scroll;
+  min-height: 525px;
 }
 
 #section__graph {
