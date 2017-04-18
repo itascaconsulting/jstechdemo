@@ -38,7 +38,6 @@ for (i=0; i<controls.length; i++) {
     min_val = controls[i][1];
     start_val = controls[i][2];
     max_val = controls[i][3];
-    // write_line(name);
 
     var show_sliders = document.getElementById("div__sliders");
 
@@ -59,31 +58,6 @@ for (i=0; i<controls.length; i++) {
 
     sliders.push(tmp_d3slider)
 }
-
-function write_line2(data) {
-    var show_data = document.getElementById("params");
-    show_data.setAttribute('style', 'white-space: pre;');
-    show_data.textContent = data + "\r\n";
-    var show_data = document.getElementById("disp");
-    show_data.setAttribute('style', 'white-space: pre;');
-    console.log("ddata", ddata);
-    show_data.textContent = ddata + "\r\n";
-}
-
-
-function write_line(data) {
-    var h1 = document.createElement("div");
-    h1.setAttribute('style', 'white-space: pre;');
-    h1.textContent += data + "\r\n";
-    document.body.appendChild(h1);
-
-        //
-        // var show_sliders = document.getElementById("div__sliders");
-        //
-        // show_sliders.appendChild(h1);
-}
-
-
 
 
 function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp) {
@@ -126,8 +100,6 @@ function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp)
 }
 
 solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp)
-
-//write_line(data);
 
 // plotting
 
@@ -315,7 +287,6 @@ function scb() {
         data += sliders[i].value() + ", ";
         local_values.push(sliders[i].value());
     }
-    write_line2(data);
     displacements.apply(null, local_values);
     update_plots();
 }
