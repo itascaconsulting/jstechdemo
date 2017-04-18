@@ -28,7 +28,7 @@ body {
 #section__slider {
   width: 50%;
   float:left;
-  height: 524px;
+  height: 82vh;
   overflow:scroll;
 }
 
