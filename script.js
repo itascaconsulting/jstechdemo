@@ -149,7 +149,6 @@ var svg = d3.select("#section__graph").append("svg")
     .call(xy_chart) ;
 
 function d3_xy_chart() {
-  console.log("here");
     var width = 640,
         height = 480,
         xlabel = "X Axis Label",
@@ -297,42 +296,31 @@ function scb() {
     write_line2(data);
     displacements.apply(null, local_values);
 
-
-
-    // console.log(document.getElementById("section__graph").replace());
-
-
-        // .datum(data)
-        // .call(xy_chart) ;
-
-
 }
 
 scb()
 
+
 d3.select("#div__sliders").on("click", function() {
-console.log("wow");
-// ok, this happens every time the slider is clicked or clicked and dragged.
+  // console.log("wow");
+  // ok, this happens every time the slider is clicked or clicked and dragged.
 
-data = [ { label: "Displacement",
-               x: x,
-               y: ddata },] ;
+  data = [ { label: "Displacement",
+                 x: x,
+                 y: ddata },] ;
 
-xy_chart = d3_xy_chart()
-    // .width(960)
-    // .height(500)
-    .xlabel("Length along cable [m]")
-    .ylabel("Displacement [m]") ;
+  xy_chart = d3_xy_chart()
+      // .width(960)
+      // .height(500)
+      .xlabel("Length along cable [m]")
+      .ylabel("Displacement [m]") ;
 
-// d3.select("#section__graph").children("svg").remove();
+  document.querySelectorAll("#section__graph")[0].innerHTML ="<h1>Output Graph</h1>";
+  // simply clears the previous graph and re-adds the h1 title.
 
-
-d3.select("#section__graph").append("svg")
-    .datum(data)
-    .call(xy_chart) ;
-
-
-
+  d3.select("#section__graph").append("svg")
+      .datum(data)
+      .call(xy_chart) ;
 
 
 });
