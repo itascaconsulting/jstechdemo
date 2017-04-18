@@ -134,9 +134,7 @@ solution = displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,dis
 var data = [ { label: "Displacement",
                x: x.map(function(i){return i*2}),
                y: ddata },
-             { label: "displacement x2",
-                x: x,
-              y: ddata}] ;
+             ] ;
 
 var xy_chart = d3_xy_chart()
     // .width(960)
@@ -286,22 +284,7 @@ function d3_xy_chart() {
     return chart;
 }
 
-function scb() {
-    local_values = [];
-    data = "";
-    for (i=0; i<sliders.length; i++) {
-        data += sliders[i].value() + ", ";
-        local_values.push(sliders[i].value());
-    }
-    write_line2(data);
-    displacements.apply(null, local_values);
-
-}
-
-scb()
-
-
-d3.select("#div__sliders").on("click", function() {
+var update_plots = function() {
   // console.log("wow");
   // ok, this happens every time the slider is clicked or clicked and dragged.
 
@@ -321,9 +304,24 @@ d3.select("#div__sliders").on("click", function() {
   d3.select("#section__graph").append("svg")
       .datum(data)
       .call(xy_chart) ;
+};
 
 
-});
+
+function scb() {
+    local_values = [];
+    data = "";
+    for (i=0; i<sliders.length; i++) {
+        data += sliders[i].value() + ", ";
+        local_values.push(sliders[i].value());
+    }
+    write_line2(data);
+    displacements.apply(null, local_values);
+    update_plots();
+}
+
+scb()
+
 
 
 
