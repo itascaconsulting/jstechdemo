@@ -70,9 +70,9 @@ var u_r = function (p_i,r) {
     var sigma_re = p0-b/r**2; // which is the critical stress..
     var sigma_rp = (p_i+c*cotphi)*(r/r0)**Q-c*cotphi;
 
-    console.log("estress at R " + sigma_R);
+
     var sigma_Rp = (p_i+c*cotphi)*(R/r0)**Q-c*cotphi;
-    console.log("estress at R " + sigma_Rp);
+
 
     //console.log("u at r0 " + u_r0);
     //console.log("u at R " + u_R);
@@ -80,16 +80,16 @@ var u_r = function (p_i,r) {
     if (r>R) {
         var u_R = (1-nu)/E*(p_i*R**(Q+1)/r0**Q - p0*R) + t/R; // disp at R
         var u_re = R**2*(1+nu)*(p0-p_cr)/E/R;
-        console.log("u at R " + u_R);
-        console.log("u at Re " + u_re);
         var dadj = R**2*(1+nu)*(p0-p_cr)/E/u_R;
-        console.log("dadj " + dadj);
 
         var du = u_R-u_re;
         // stress match to Kirsch solution? not sure if this is correct
         return {R:R,// u:(R-u_re)**2*(1+nu)*(p0-p_cr)/E/(r-u_re)};
-                u:R**2*(1+nu)*(p0-p_cr)/E/(r)+du, sigma: sigma_re};
+                u:R**2*(1+nu)*(p0-p_cr)/E/(dadj+(r-R)),
+                u2:R**2*(1+nu)*(p0-p_cr)/E/r+du,
+                sigma: sigma_re};
     }
+
     return {R:R, u: u_r, sigma: sigma_rp};
 }
 
@@ -99,6 +99,8 @@ show(u_r(0,r0));
 show(u_r(1e6,r0));
 show(u_r(6e6,r0));
 show(u_r(7e6,r0));
+show("disp at R: " + u_r(0,u_r(0,r0).R).u);
+
 // show(u_r(0,r0+0.1));
 // show(u_r(0,r0+0.2));
 // show(u_r(0,r0+0.3));
@@ -128,12 +130,9 @@ var plot_xy = function (xarray, yarray) {
         height = 220 - margin.top - margin.bottom;
     var     x = d3.scale.linear().range([0, width]);
     var     y = d3.scale.linear().range([height, 0]);
-    //
-    //d3.extent(yarray)
+
     var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
     var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
-
-    var data = {x: xarray, y: yarray};
 
     var valueline = function(xa, ya){
         return d3.svg.line()
@@ -141,10 +140,6 @@ var plot_xy = function (xarray, yarray) {
             .y(function(d,i) { return y(ya[i]); })
         (Array(xa.length));
     }
-
-    // var valueline = d3.svg.line()
-    //     .x(function(d,i) { return x(d.x[i]);})
-    //     .y(function(d,i) { return y(d.y[i]);})
 
     var chart1 = d3.select("body")
         .append("svg")
@@ -175,7 +170,5 @@ var plot_xy = function (xarray, yarray) {
 
 plot_xy(depth, u_depth);
 //plot_xy(depth, u_depthe);
-plot_xy(depth, u_stress);
-
 //plot_xy(reaction, support_pressures);
-//plot_xy(reaction2, support_pressures);
+plot_xy(reaction2, support_pressures);
