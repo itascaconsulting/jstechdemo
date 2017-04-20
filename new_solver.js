@@ -65,17 +65,12 @@ var u_r = function (p_i,r) {
     var t0 = p0+c*cotphi-(p_i + c*cotphi*(R/r0)**Q);
     var t = (1-nu)/E*R**2*t0 + b*(1+nu)/E;
     var u_r = (1-nu)/E*(p_i*r**(Q+1)/r0**Q - p0*r) + t/r;
-    //var u_r0 = (1-nu)/E*(p_i*r0**(Q+1)/r0**Q - p0*r0) + t/r0;
-    var sigma_R = p0-b/R**2; // which is the critical stress..
-    var sigma_re = p0-b/r**2; // which is the critical stress..
+    //var sigma_R = p0-b/R**2; // which is the critical stress..
+    //var sigma_Rp = (p_i+c*cotphi)*(R/r0)**Q-c*cotphi; // which is the critical stress..
+    var sigma_re = p0-b/r**2;
     var sigma_rp = (p_i+c*cotphi)*(r/r0)**Q-c*cotphi;
 
 
-    var sigma_Rp = (p_i+c*cotphi)*(R/r0)**Q-c*cotphi;
-
-
-    //console.log("u at r0 " + u_r0);
-    //console.log("u at R " + u_R);
 
     if (r>R) {
         var u_R = (1-nu)/E*(p_i*R**(Q+1)/r0**Q - p0*R) + t/R; // disp at R
@@ -84,9 +79,8 @@ var u_r = function (p_i,r) {
 
         var du = u_R-u_re;
         // stress match to Kirsch solution? not sure if this is correct
-        return {R:R,// u:(R-u_re)**2*(1+nu)*(p0-p_cr)/E/(r-u_re)};
+        return {R:R,
                 u:R**2*(1+nu)*(p0-p_cr)/E/(dadj+(r-R)),
-                u2:R**2*(1+nu)*(p0-p_cr)/E/r+du,
                 sigma: sigma_re};
     }
 
@@ -101,10 +95,6 @@ show(u_r(6e6,r0));
 show(u_r(7e6,r0));
 show("disp at R: " + u_r(0,u_r(0,r0).R).u);
 
-// show(u_r(0,r0+0.1));
-// show(u_r(0,r0+0.2));
-// show(u_r(0,r0+0.3));
-// show(u_r(0,7));
 
 var np_linspace = function (start,end,num,endpoint) {
     var local_endpoint = endpoint || false;
@@ -118,7 +108,7 @@ reaction = support_pressures.map(u);
 reaction2 = support_pressures.map(function (d) { return u_r(d,r0).u; });
 
 
-var depth = np_linspace(r0,r0+10.0,100,true);
+var depth = np_linspace(r0,r0+50.0,100,true);
 u_depth = depth.map(function (d) { return u_r(0,d).u;});
 u_depthe = depth.map(function (d) { return u_re(0,d).u;});
 u_stress = depth.map(function (d) { return u_r(0,d).sigma;});
@@ -188,6 +178,6 @@ var plot_xy = function (datasets) {
     });
 }
 
+plot_xy([[depth, u_stress]])
 plot_xy([[depth, u_depth], [depth, u_depthe]]);
-
 plot_xy([[reaction, support_pressures], [reaction2, support_pressures]]);
