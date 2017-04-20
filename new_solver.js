@@ -47,7 +47,7 @@ show(u(6e6));
 show(u(7e6));
 
 var u_re = function (p_i,r) {
- return {R:r0, u:r0**2*(1+nu)*(p0-p_i)/E/r}; // Kirsch solution
+    return {R:r0, u:r0**2*(1+nu)*(p0-p_i)/E/r}; // Kirsch solution
 }
 
 
@@ -124,7 +124,7 @@ u_depthe = depth.map(function (d) { return u_re(0,d).u;});
 u_stress = depth.map(function (d) { return u_r(0,d).sigma;});
 
 
-var plot_xy = function (xarray, yarray) {
+var plot_xy = function (datasets) {
     var margin = {top: 30, right: 20, bottom: 30, left: 70},
         width = 400 - margin.left - margin.right,
         height = 220 - margin.top - margin.bottom;
@@ -148,27 +148,46 @@ var plot_xy = function (xarray, yarray) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain(d3.extent(d3.extent(xarray)));
-    y.domain([0,d3.max(d3.extent(yarray))]);
+    var xmin = math.max(datasets[0][0]);
+    var xmax = math.min(datasets[0][0]);
+    var ymin = math.max(datasets[0][1]);
+    var ymax = math.min(datasets[0][1]);
+    datasets.forEach( function (d) {
+        xarray = d[0];
+        yarray = d[1];
+        if (math.max(xarray) > xmax) { xmax = math.max(xarray); }
+        if (math.min(xarray) < xmin) { xmin = math.min(xarray); }
+        if (math.max(yarray) > ymax) { ymax = math.max(yarray); }
+        if (math.min(yarray) < ymin) { ymin = math.min(yarray); }
+    });
 
-    // Add the valueline path.
-    chart1.append("path")
-        .attr("class", "line")
-        .attr("d", valueline(xarray, yarray));
+    x.domain([xmin,xmax]);
+    y.domain([0,ymax]);
 
-    // Add the X Axis
-    chart1.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+    var colors = d3.scale.category10().domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    datasets.forEach(function (d, i) {
+        xarray = d[0];
+        yarray = d[1];
 
-    // Add the Y Axis
-    chart1.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
+        // Add the valueline path.
+        chart1.append("path")
+            .attr("class", "line")
+            .attr("stroke", colors(i%10))
+            .attr("d", valueline(xarray, yarray));
+
+        // Add the X Axis
+        chart1.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        // Add the Y Axis
+        chart1.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+    });
 }
 
-plot_xy(depth, u_depth);
-//plot_xy(depth, u_depthe);
-//plot_xy(reaction, support_pressures);
-plot_xy(reaction2, support_pressures);
+plot_xy([[depth, u_depth], [depth, u_depthe]]);
+
+plot_xy([[reaction, support_pressures], [reaction2, support_pressures]]);
