@@ -5,56 +5,23 @@
   <meta charset="utf-8">
 
     <script type="text/javascript" src="./math.min.js"></script>
+    <script type="text/javascript" src="./new_solver.js"></script>
+    <script type="text/javascript" src="./unit.js"></script>
 
-  <title>Solver Test</title>
+  <title>Solver Test Suite</title>
 </head>
 
 
 <body>
 
-
 <script >
 
-// input
-nu = 0.3;
-E = 1.8e9;
-c = 1.5e6;
-phi = 23;
-p0 = 7e6;
-r0 = 5.0;
-
-// derived
-phi *= Math.PI/180.0
-k = (1+Math.sin(phi))/(1-Math.sin(phi));
-sigma_cm = 2*c*Math.cos(phi)/(1-Math.sin(phi)); // ucs
-p_cr = (2 * p0 - sigma_cm)/(1+k); // critical pressure
-
-var r_p = function (pi) {
-    if (pi > p_cr) {
-        return r0;
-    }
-    return r0*(2*(p0*(k-1)+sigma_cm)/((1+k)*(k-1*pi+sigma_cm)))**(1/(k-1));
-}
-var u = function (pi) {
-    if (pi > p_cr) {
-        return r0*(1+nu)*(p0-pi)/E; // elastic
-    }
-    return r0*(1+nu)*(2*(1-nu)*(p0-p_cr)*(r_p(pi)/r0)**2-(1-2*nu)*(p0-pi))/E;
-}
-
-
-function show(data) {
-    console.log(math.format(data,  {notation: 'engineering'}));
-}
-
-show(sigma_cm);
-show(k);
-show(p_cr);
-show(r_p(0.0));
-show(u(0.0));
-
-r = math.range(0,p0,p0/25,true);
-console.log(r.map(u)._data);
+unitjs.number(sigma_cm).isApprox(4.53e6, 1e4);
+unitjs.number(k).isApprox(2.28, 0.01);
+unitjs.number(p_cr).isApprox(2.88e6, 1e4);
+unitjs.number(r_p(0.0)).isApprox(7.96, 0.01);
+unitjs.number(u(0.0)).isApprox(0.0427, 1e-4);
+unitjs.number(u(7e6)).isApprox(0.0, 1e-6);
 
 
 </script>
