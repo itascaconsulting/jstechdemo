@@ -63,7 +63,7 @@ for (i=0; i<controls.length; i++) {
 function displacements(A,E,slen,Kbond,Sbond,n,Yield,Rupture,ds,dy,dr,theta,disp) {
     //derived properties
     n = 2*parseInt(n);
-    Kbond = 10**Kbond;
+    Kbond = Math.pow(10,Kbond);
     c1 = E*A/slen;
     c2 = Kbond*slen;
     c3 = Sbond*slen;
