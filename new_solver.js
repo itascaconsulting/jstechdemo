@@ -8,13 +8,18 @@ var nu = 0.3,
     c = 1.5e6,
     phi = 23.0,
     p0 = 7e6,
-    r0 = 5.0;
+    r0 = 5.0,
+    psi = 0.0;
 
 // derived
 phi *= Math.PI/180.0;
-k = (1+Math.sin(phi))/(1-Math.sin(phi));
-sigma_cm = 2*c*Math.cos(phi)/(1-Math.sin(phi)); // ucs
-p_cr = (2 * p0 - sigma_cm)/(1+k); // critical pressure
+var k = (1+Math.sin(phi))/(1-Math.sin(phi));
+var k_psi = (1+Math.sin(psi))/(1-Math.sin(psi));
+var G = E/2.0/(1+nu);
+//var sigma_cm = 2*c*Math.cos(phi)/(1-Math.sin(phi)); // ucs
+var sigma_cm = 2*c*Math.sqrt(k);
+
+var p_cr = (2 * p0 - sigma_cm)/(1+k); // critical pressure
 
 var r_p = function (p_i) {
     if (p_i > p_cr) {
@@ -34,7 +39,8 @@ function show(data) {
     console.log(math.format(data,  {notation: 'engineering'}));
 }
 
-// show(sigma_cm);
+show(sigma_cm);
+
 // show(k);
 // show(p_cr);
 show(r_p(0.0));
@@ -88,12 +94,44 @@ var u_r = function (p_i,r) {
 }
 
 
+function u_r_cct(p_i,r) {
+
+    var S0 = p0 + sigma_cm / (k-1),
+        Pi = p_i + sigma_cm / (k-1),
+        Pcr = 2*S0/(k+1),
+        R = r0*Math.pow(Pcr/Pi, 1/(k-1));
+
+    if (Pi>Pcr) {
+        var u_e = (S0-Pi)/2.0/G*Math.pow(r0,2)/r;
+        return {R:r0, u: u_e};
+    }
+
+    if (r>R) {
+        var u_e = (S0-Pcr)/2.0/G*Math.pow(R,2)/r;
+        return {R:r0, u: u_e};
+    }
+    var tmpc = (1-nu)*(k*k_psi+1)-nu*(k+k_psi);
+    var tmpa = ((k_psi-1)*(k-1) -2*tmpc)/((k_psi+1)*(k-1))*r/R;
+    var tmpb = 2*G/(S0-Pcr)/R;
+
+    var tmpd = (2*(k+k_psi)+2*tmpc)/((k_psi+1)*(k+k_psi))*Math.pow(r/R,-k_psi);
+    var tmpe = (2*tmpc)/((k+k_psi)*(k-1))*Math.pow(r/R,k);
+    var u = (tmpa + tmpd + tmpe)/tmpb;
+    return {R:R, u:u};
+}
+
 
 show(u_r(0,r0));
 show(u_r(1e6,r0));
 show(u_r(6e6,r0));
 show(u_r(7e6,r0));
 show("disp at R: " + u_r(0,u_r(0,r0).R).u);
+
+show(u_r_cct(0,r0));
+show(u_r_cct(1e6,r0));
+show(u_r_cct(6e6,r0));
+show(u_r_cct(7e6,r0));
+
 
 
 var np_linspace = function (start,end,num,endpoint) {
@@ -106,10 +144,13 @@ var np_linspace = function (start,end,num,endpoint) {
 support_pressures = np_linspace(0,p0,25,true);
 reaction = support_pressures.map(u);
 reaction2 = support_pressures.map(function (d) { return u_r(d,r0).u; });
+reaction3 = support_pressures.map(function (d) { return u_r_cct(d,r0).u; });
 
 
 var depth = np_linspace(r0,r0+50.0,100,true);
 u_depth = depth.map(function (d) { return u_r(0,d).u;});
+u_depth_cct = depth.map(function (d) { return u_r_cct(0,d).u;});
+
 u_depthe = depth.map(function (d) { return u_re(0,d).u;});
 u_stress = depth.map(function (d) { return u_r(0,d).sigma;});
 
@@ -184,5 +225,7 @@ var plot_xy = function (datasets) {
 }
 
 plot_xy([[depth, u_stress]])
-plot_xy([[depth, u_depth], [depth, u_depthe]]);
-plot_xy([[reaction, support_pressures], [reaction2, support_pressures]]);
+plot_xy([[depth, u_depth], [depth, u_depthe], [depth, u_depth_cct]]);
+plot_xy([[reaction, support_pressures],
+         [reaction2, support_pressures],
+         [reaction3, support_pressures]]);
