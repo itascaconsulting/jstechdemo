@@ -3,12 +3,12 @@
 
 
 // input
-nu = 0.3;
-E = 1.8e9;
-c = 1.5e6;
-phi = 23.0;
-p0 = 7e6;
-r0 = 5.0;
+var nu = 0.3,
+    E = 1.8e9,
+    c = 1.5e6,
+    phi = 23.0,
+    p0 = 7e6,
+    r0 = 5.0;
 
 // derived
 phi *= Math.PI/180.0;
@@ -121,8 +121,13 @@ var plot_xy = function (datasets) {
     var     x = d3.scale.linear().range([0, width]);
     var     y = d3.scale.linear().range([height, 0]);
 
-    var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
-    var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+    var xAxis = d3.svg.axis().scale(x)
+        .orient("bottom")
+        .ticks(5);
+    var yAxis = d3.svg.axis().scale(y)
+        .orient("left")
+        .ticks(5)
+        .tickFormat(d3.format("2e"));
 
     var valueline = function(xa, ya){
         return d3.svg.line()
